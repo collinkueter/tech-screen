@@ -77,7 +77,6 @@ class TestExternalAPIService:
 
             assert result is None
 
-
     def test_find_song_by_partial_match_found(self):
         """Test finding song by partial ISRC match."""
         mock_response = Mock()
@@ -152,11 +151,9 @@ class TestExternalAPIService:
 
             assert result is None
 
-
-
     def test_base_url_configuration(self):
         """Test that BASE_URL is correctly configured."""
-        assert ExternalAPIService.BASE_URL == "http://localhost:4001/api/songs"
+        assert ExternalAPIService.BASE_URL == "http://external-api:4001/api/songs"
 
     def test_timeout_configuration(self):
         """Test that DEFAULT_TIMEOUT is correctly configured."""
@@ -175,9 +172,7 @@ class TestExternalAPIService:
             ExternalAPIService.fetch_song_by_partial_isrc("12345")
 
             # Verify the URL was constructed correctly
-            mock_get.assert_called_once_with(
-                "http://localhost:4001/api/songs/12345"
-            )
+            mock_get.assert_called_once_with("http://external-api:4001/api/songs/12345")
 
     def test_find_song_by_partial_match_no_title(self):
         """Test find_song_by_partial_match when metadata has no title."""

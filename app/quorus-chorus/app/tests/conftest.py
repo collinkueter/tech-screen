@@ -10,9 +10,14 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def db() -> Generator:
-    yield SessionLocal()
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.rollback()
+        session.close()
 
 
 @pytest.fixture(scope="module")

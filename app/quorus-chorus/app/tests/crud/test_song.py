@@ -1,4 +1,5 @@
 from decimal import Decimal
+import uuid
 
 import pytest
 from sqlalchemy.orm import Session
@@ -14,8 +15,9 @@ class TestSongCRUD:
     @pytest.fixture
     def sample_song_data(self) -> SongCreate:
         """Create sample song data for testing."""
+        unique_id = str(uuid.uuid4())[:4]
         return SongCreate(
-            isrc="US-TEST-23-12345",
+            isrc=f"US-T{unique_id}",
             title="Test Song",
             artist="Test Artist",
             album="Test Album",
@@ -88,10 +90,11 @@ class TestSongCRUD:
 
     def test_get_multi_songs(self, db: Session):
         """Test retrieving multiple songs."""
-        # Create multiple songs
+        # Create multiple songs with unique ISRCs
+        base_uuid = str(uuid.uuid4())[:3]
         songs_data = [
             SongCreate(
-                isrc=f"US-TEST-23-1234{i}",
+                isrc=f"US-M{base_uuid}{i}",
                 title=f"Test Song {i}",
                 artist=f"Artist {i}",
                 album=f"Album {i}",
@@ -113,8 +116,9 @@ class TestSongCRUD:
 
     def test_create_or_update_song_create(self, db: Session):
         """Test create_or_update method - create case."""
+        unique_id = str(uuid.uuid4())[:4]
         song_data = SongCreate(
-            isrc="US-NEW-23-99999",
+            isrc=f"US-N{unique_id}",
             title="New Song",
             artist="New Artist",
             album="New Album",
@@ -170,8 +174,9 @@ class TestSongCRUD:
 
     def test_decimal_precision(self, db: Session):
         """Test that decimal values maintain proper precision."""
+        unique_id = str(uuid.uuid4())[:4]
         song_data = SongCreate(
-            isrc="US-DECIMAL-23-55555",
+            isrc=f"US-D{unique_id}",
             title="Precise Song",
             artist="Precise Artist",
             album="Precise Album",
@@ -184,8 +189,9 @@ class TestSongCRUD:
 
     def test_optional_fields(self, db: Session):
         """Test creating songs with minimal required fields."""
+        unique_id = str(uuid.uuid4())[:4]
         minimal_song_data = SongCreate(
-            isrc="US-MINIMAL-23-44444",
+            isrc=f"US-MI{unique_id}",
             title=None,
             artist=None,
             album=None,
@@ -194,7 +200,7 @@ class TestSongCRUD:
         )
 
         song = crud_song.song.create(db=db, obj_in=minimal_song_data)
-        assert song.isrc == "US-MINIMAL-23-44444"
+        assert song.isrc == f"US-MI{unique_id}"
         assert song.payout_per_play == Decimal("0.001000")
         assert song.title is None
         assert song.artist is None
