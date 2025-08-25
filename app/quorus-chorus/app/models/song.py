@@ -12,5 +12,6 @@ class Song(Base):
     isrc: Mapped[str] = mapped_column(String(16), unique=True, index=True)
     album: Mapped[str | None] = mapped_column(String(150))
     artist: Mapped[str | None] = mapped_column(String(150))
+    title: Mapped[str | None] = mapped_column(String(150))
     payout_per_play: Mapped[Decimal] = mapped_column(Numeric(precision=9, scale=8))
     licensing_group: Mapped[str | None] = mapped_column(String(150))
