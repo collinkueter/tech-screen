@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.models.song import Song
@@ -30,8 +31,27 @@ class CRUDSong(CRUDBase[Song, SongCreate, SongUpdate]):
     #
     # External API URL: GET http://localhost:4001/api/songs/{ISRC}
 
-    def get_by_isrc(self, db: Session, *, isrc: str) -> Song | None:
+    def get_by_isrc(self, db: Session, *, isrc: str) -> Optional[Song]:
+        """Get a song by its ISRC."""
         return db.scalar(select(Song).where(Song.isrc == isrc))
+
+    def create_or_update(self, db: Session, *, obj_in: SongCreate) -> Song:
+        """Create a new song or update existing one if ISRC exists."""
+        existing = self.get_by_isrc(db=db, isrc=obj_in.isrc)
+        if existing:
+            # Update existing song
+            update_data = obj_in.model_dump(exclude_unset=True)
+            for field, value in update_data.items():
+                setattr(existing, field, value)
+            db.add(existing)
+            db.commit()
+            db.refresh(existing)
+            return existing
+        else:
+            # Create new song
+            return self.create(db=db, obj_in=obj_in)
+
+
 
 
 song = CRUDSong(Song)
